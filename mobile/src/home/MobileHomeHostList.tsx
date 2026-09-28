@@ -8,10 +8,13 @@ import { classifyConnection } from '../transport/connection-health'
 import { resolveHomeHostConnectionState } from '../transport/home-host-auto-connect'
 import type { MobileConnectionPath } from '../transport/stable-logical-rpc-client'
 import type { ConnectionState, HostCatalogEntry } from '../transport/types'
+import type { HomeAttentionItem } from '../worktree/home-attention-items'
 import type { HostWorktreeInfo } from '../worktree/home-worktree-info'
+import { MobileHomeAttentionSection } from './MobileHomeAttentionSection'
 import { MobileHomeListHeader } from './MobileHomeListHeader'
 
 type MobileHomeHostListProps = {
+  attentionItems: HomeAttentionItem[]
   autoConnectHostIds: string[]
   bottomInset: number
   contentMaxWidth: number
@@ -30,6 +33,7 @@ type MobileHomeHostListProps = {
   onOpen: (host: HostCatalogEntry) => void
   onLongPress: (host: HostCatalogEntry) => void
   onOpenActions: (host: HostCatalogEntry) => void
+  onOpenAttention: (item: HomeAttentionItem) => void
 }
 
 export function MobileHomeHostList(props: MobileHomeHostListProps) {
@@ -80,7 +84,17 @@ export function MobileHomeHostList(props: MobileHomeHostListProps) {
           alignSelf: 'center'
         }
       ]}
-      ListHeaderComponent={<MobileHomeListHeader stats={props.stats} />}
+      ListHeaderComponent={
+        <MobileHomeListHeader
+          stats={props.stats}
+          attention={
+            <MobileHomeAttentionSection
+              items={props.attentionItems}
+              onOpen={props.onOpenAttention}
+            />
+          }
+        />
+      }
       ItemSeparatorComponent={CardGap}
       renderItem={renderHost}
       ListFooterComponent={props.footer}

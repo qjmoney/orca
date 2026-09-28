@@ -14,7 +14,13 @@ function formatDuration(ms: number): string {
   return totalHours > 0 ? `${totalHours}h ${minutes}m` : `${totalMinutes}m`
 }
 
-export function MobileHomeListHeader({ stats }: { stats: HomeStatsSummary | null }) {
+export function MobileHomeListHeader({
+  stats,
+  attention
+}: {
+  stats: HomeStatsSummary | null
+  attention?: React.ReactNode
+}) {
   return (
     <View>
       <View style={styles.hero}>
@@ -36,6 +42,7 @@ export function MobileHomeListHeader({ stats }: { stats: HomeStatsSummary | null
           </View>
         </View>
       ) : null}
+      {attention}
       <Text style={styles.sectionHeading}>Desktops</Text>
     </View>
   )

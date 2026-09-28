@@ -14,6 +14,9 @@ export type HostWorktreeInfo = {
   totalWorktrees: number
   activeCount: number
   lastActiveWorktree: HomeWorktreeSummary | null
+  // Worktrees blocked on user input ('permission' status), surfaced on Home so a waiting
+  // session is reachable without opening each host first.
+  attentionWorktrees?: HomeWorktreeSummary[]
   catalogUnavailable?: boolean
   // The counts are the last proven ones, kept across a failed refresh.
   staleCounts?: boolean

@@ -96,6 +96,7 @@ describe('fetchHomeHostWorktreeInfo', () => {
       totalWorktrees: 12,
       activeCount: 2,
       lastActiveWorktree: expect.objectContaining({ worktreeId: 'wt-0' }),
+      attentionWorktrees: [],
       catalogUnavailable: true,
       staleCounts: true,
       // Age-stamped so the card can stop calling day-old counts "last known".

@@ -60,6 +60,7 @@ export function fetchHomeHostWorktreeInfo(
             totalWorktrees: worktrees.length,
             activeCount: active.length,
             lastActiveWorktree: lastActive,
+            attentionWorktrees: worktrees.filter((w) => w.status === 'permission'),
             countsProvenAt: Date.now()
           }
         }))

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Alert, StyleSheet } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useOpenMobileAccounts } from '../accounts/use-open-mobile-accounts'
@@ -25,6 +25,7 @@ import { removeHostAndCloseClient } from '../transport/host-removal-lifecycle'
 import { loadHostCatalog } from '../transport/host-store'
 import type { HostCatalogEntry, HostProfile } from '../transport/types'
 import { useOpenMobileHostEdit } from '../transport/use-open-mobile-host-edit'
+import { collectHomeAttentionItems, type HomeAttentionItem } from '../worktree/home-attention-items'
 import type { HomeWorktreeSummary } from '../worktree/home-worktree-info'
 import { isResumeTargetConfirmedMissing, type HomeResumeCard } from '../worktree/home-resume-card'
 import { MobileHomeEmptyState } from './MobileHomeEmptyState'
@@ -76,6 +77,22 @@ export function MobileHomeScreen() {
     [data.primaryHost, openMobileTasks]
   )
 
+  const attentionItems = useMemo(
+    () => collectHomeAttentionItems(data.sortedHostCatalog, data.worktreeInfo),
+    [data.sortedHostCatalog, data.worktreeInfo]
+  )
+
+  const openAttention = useCallback(
+    (item: HomeAttentionItem) => {
+      openMobileSession({
+        hostId: item.hostId,
+        worktreeId: item.worktree.worktreeId,
+        name: item.worktree.displayName || item.worktree.repo
+      })
+    },
+    [openMobileSession]
+  )
+
   function openHost(host: HostCatalogEntry): void {
     if (host.credentialStatus === 'missing') {
       data.router.push('/pair-scan')
@@ -123,6 +140,7 @@ export function MobileHomeScreen() {
         />
       ) : (
         <MobileHomeHostList
+          attentionItems={attentionItems}
           autoConnectHostIds={data.autoConnectHostIds}
           bottomInset={insets.bottom}
           contentMaxWidth={contentMaxWidth}
@@ -157,6 +175,7 @@ export function MobileHomeScreen() {
             openHostActions(host)
           }}
           onOpenActions={openHostActions}
+          onOpenAttention={openAttention}
         />
       )}
       <ActionSheetModal

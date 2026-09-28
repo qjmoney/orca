@@ -10,6 +10,7 @@ import * as SplashScreen from 'expo-splash-screen'
 import * as Notifications from 'expo-notifications'
 import * as Linking from 'expo-linking'
 import { colors } from '../src/theme/mobile-theme'
+import { useScaledWindowDimensions } from '../src/layout/use-scaled-window-dimensions'
 import { OrcaLogo } from '../src/components/OrcaLogo'
 import { RpcClientProvider } from '../src/transport/client-context'
 import { getNotificationNavigationTarget } from '../src/notifications/notification-routing'
@@ -189,9 +190,26 @@ export default function RootLayout() {
     await SplashScreen.hideAsync()
   }, [])
 
+  const { width, height, scale } = useScaledWindowDimensions()
+
   return (
     <RpcClientProvider>
-      <View style={styles.root} onLayout={onNavigatorLayout}>
+      <View
+        style={[
+          styles.root,
+          scale !== 1 && {
+            // Lay out in logical (scaled-down) space, then visually upscale so
+            // far-view displays (car head-units, casts) get usable sizes.
+            width,
+            height,
+            transform: [{ scale }],
+            // RN parses percent/px entries (array or string) — 'top left' is not
+            // valid and silently falls back to the center origin.
+            transformOrigin: [0, 0, 0]
+          }
+        ]}
+        onLayout={onNavigatorLayout}
+      >
         <StatusBar style="light" />
         <Stack
           screenOptions={{
@@ -224,6 +242,7 @@ export default function RootLayout() {
           <Stack.Screen name="settings" options={{ headerShown: false }} />
           <Stack.Screen name="terminal-settings" options={{ headerShown: false }} />
           <Stack.Screen name="native-chat-settings" options={{ headerShown: false }} />
+          <Stack.Screen name="display-settings" options={{ headerShown: false }} />
           <Stack.Screen name="browser-settings" options={{ headerShown: false }} />
           <Stack.Screen name="voice-settings" options={{ headerShown: false }} />
           <Stack.Screen name="notifications" options={{ headerShown: false }} />

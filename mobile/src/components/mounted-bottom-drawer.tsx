@@ -1,14 +1,6 @@
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
-import {
-  View,
-  Pressable,
-  useWindowDimensions,
-  ScrollView,
-  Keyboard,
-  BackHandler,
-  Modal,
-  Platform
-} from 'react-native'
+import { View, Pressable, ScrollView, Keyboard, BackHandler, Modal, Platform } from 'react-native'
+import { useScaledWindowDimensions } from '../layout/use-scaled-window-dimensions'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler'
 import Animated, {
@@ -73,7 +65,7 @@ export function MountedBottomDrawer({
   // reanimated translate) so height shrinks as the sheet lifts and the top
   // edge stays under the status bar.
   const [keyboardInset, setKeyboardInset] = useState(0)
-  const { height: screenHeight } = useWindowDimensions()
+  const { height: screenHeight } = useScaledWindowDimensions()
   const insets = useSafeAreaInsets()
   // Why: on wide/tablet canvases a full-width sheet looks stretched; cap it and
   // center it horizontally. Vertical bottom-anchoring (and all the drag/keyboard

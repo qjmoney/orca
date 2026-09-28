@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
-import { Animated, BackHandler, Text, useWindowDimensions, View } from 'react-native'
+import { Animated, BackHandler, Text, View } from 'react-native'
+import { useScaledWindowDimensions } from '../src/layout/use-scaled-window-dimensions'
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { OrcaLogo } from '../src/components/OrcaLogo'
@@ -46,7 +47,7 @@ function MobileOnboardingFlow({
 }) {
   const router = useRouter()
   const steps = useMemo(() => parseMobileOnboardingSteps(rawSteps), [rawSteps])
-  const { width } = useWindowDimensions()
+  const { width } = useScaledWindowDimensions()
   const [activeIndex, setActiveIndex] = useState(0)
   const [busyChoice, setBusyChoice] = useState<MobileOnboardingBusyChoice>(null)
   const [error, setError] = useState<string | null>(null)

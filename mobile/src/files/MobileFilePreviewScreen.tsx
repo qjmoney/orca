@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, BackHandler, Pressable, Text, View, useWindowDimensions } from 'react-native'
+import { Alert, BackHandler, Pressable, Text, View } from 'react-native'
+import { useScaledWindowDimensions } from '../layout/use-scaled-window-dimensions'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { ChevronLeft, Save } from 'lucide-react-native'
@@ -46,7 +47,7 @@ export function MobileFilePreviewScreen({ route }: Props) {
   const draftContentRef = useRef(draftContent)
   const savedContentRef = useRef(savedContent)
   const draftSourceKeyRef = useRef<string | null>(null)
-  const { width, height } = useWindowDimensions()
+  const { width, height } = useScaledWindowDimensions()
   const routePreviewSource = useMemo(
     () => (previewParams ? previewSourceFromRoute(previewParams) : null),
     [previewParams]

@@ -11,6 +11,7 @@ import * as Notifications from 'expo-notifications'
 import * as Linking from 'expo-linking'
 import { colors } from '../src/theme/mobile-theme'
 import { useScaledWindowDimensions } from '../src/layout/use-scaled-window-dimensions'
+import { useDisplayDiagnostics } from '../src/layout/use-display-diagnostics'
 import { OrcaLogo } from '../src/components/OrcaLogo'
 import { RpcClientProvider } from '../src/transport/client-context'
 import { getNotificationNavigationTarget } from '../src/notifications/notification-routing'
@@ -191,6 +192,7 @@ export default function RootLayout() {
   }, [])
 
   const { width, height, scale } = useScaledWindowDimensions()
+  useDisplayDiagnostics()
 
   return (
     <RpcClientProvider>

@@ -14,22 +14,36 @@ const EXTRA_CONFIG_CHANGES = ['density', 'fontScale', 'fontWeightAdjustment']
 const IMPORTS_ANCHOR = 'import android.os.Bundle\n'
 const IMPORTS_ADD =
   'import android.content.res.Configuration\n' +
+  'import android.util.Log\n' +
   'import com.facebook.react.uimanager.DisplayMetricsHolder\n'
 const ONCREATE_ANCHOR = 'super.onCreate(null)'
 const ONCREATE_ADD = `
 
-    // RN seeds DisplayMetricsHolder from applicationContext (default display).
-    // Rebind to this activity's display for correct metrics on secondary
-    // displays (casts/DeX/Tesor).
-    DisplayMetricsHolder.initDisplayMetrics(this)`
+    rebindDisplayMetrics("onCreate")`
 const LIFECYCLE_BLOCK = `
+
+  // RN seeds DisplayMetricsHolder from applicationContext (default display
+  // metrics). On secondary displays (car casts like Tesor, DeX) that yields
+  // phone metrics — the app lays out a shrunken phone column. Rebind to this
+  // activity's display and log both sides so repro dumps show what changed.
+  private fun rebindDisplayMetrics(why: String) {
+    DisplayMetricsHolder.initDisplayMetrics(this)
+    val window = DisplayMetricsHolder.getWindowDisplayMetrics()
+    val screen = DisplayMetricsHolder.getScreenDisplayMetrics()
+    Log.i(
+      "OrcaDisplay",
+      "$why displayId=\${display?.displayId} " +
+        "window=\${window.widthPixels}x\${window.heightPixels}@\${window.densityDpi}dpi " +
+        "screen=\${screen.widthPixels}x\${screen.heightPixels}@\${screen.densityDpi}dpi"
+    )
+  }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
     // RN re-seeds the holder from the React (application) context inside the
     // super call — rebind AFTER it so downstream emissions/draws see this
     // display's metrics.
-    DisplayMetricsHolder.initDisplayMetrics(this)
+    rebindDisplayMetrics("onConfigurationChanged")
   }
 
   override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -38,7 +52,7 @@ const LIFECYCLE_BLOCK = `
     // holder with application metrics; focus is the last lifecycle point before
     // the first frame.
     if (hasFocus) {
-      DisplayMetricsHolder.initDisplayMetrics(this)
+      rebindDisplayMetrics("onWindowFocusChanged")
     }
   }
 `
@@ -49,7 +63,7 @@ function withMainActivityDisplayMetrics(config) {
       return cfg
     }
     let contents = cfg.modResults.contents
-    if (contents.includes('DisplayMetricsHolder.initDisplayMetrics')) {
+    if (contents.includes('rebindDisplayMetrics')) {
       return cfg
     }
     if (!contents.includes(IMPORTS_ANCHOR) || !contents.includes(ONCREATE_ANCHOR)) {

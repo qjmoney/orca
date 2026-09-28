@@ -322,6 +322,10 @@ export function MobileSessionCommandDock({ controller }: { controller: MobileSes
               autoComplete="off"
               keyboardType={getTerminalLiveInputKeyboardType(Platform.OS)}
               returnKeyType="default"
+              // Why: on secondary displays (car casts/DeX landscape) Android
+              // IMEs default to fullscreen extract mode and cover the whole
+              // screen; keep the keyboard as a bottom overlay instead.
+              disableFullscreenUI
               blurOnSubmit={false}
               editable={canSend}
               importantForAutofill="no"
@@ -353,6 +357,7 @@ export function MobileSessionCommandDock({ controller }: { controller: MobileSes
               autoComplete="off"
               keyboardType={getTerminalCommandKeyboardType(Platform.OS, autocompleteEnabled)}
               returnKeyType="send"
+              disableFullscreenUI
               blurOnSubmit={false}
               // Why: composing is local — an outage must not lock the field or discard typed text (#6713).
               editable={canCompose}

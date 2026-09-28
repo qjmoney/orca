@@ -10,6 +10,9 @@ const mobileRoot = fileURLToPath(new URL('../..', import.meta.url))
 // logical size through use-scaled-window-dimensions instead.
 const ALLOWED_FILES = new Set([
   'src/layout/use-scaled-window-dimensions.ts',
+  // diagnostics must see the raw display values — reporting the scaled ones
+  // would hide the very mismatch it exists to catch
+  'src/layout/use-display-diagnostics.ts',
   'src/layout/window-dimensions-boundary.test.ts'
 ])
 
@@ -27,8 +30,9 @@ describe('window dimensions boundary', () => {
       ...sourceFiles(join(mobileRoot, 'src'))
     ]
       .filter((path) => /\.[jt]sx?$/.test(path))
-      // tests mock react-native's hook; they are not layout consumers
+      // tests/mock fixtures mention the hook in comments; they are not layout consumers
       .filter((path) => !/\.test\.[jt]sx?$/.test(path))
+      .filter((path) => !relative(mobileRoot, path).startsWith('src/test-support/'))
       .filter((path) => !ALLOWED_FILES.has(relative(mobileRoot, path)))
       .filter((path) => /\buseWindowDimensions\b/.test(readFileSync(path, 'utf8')))
       .map((path) => relative(mobileRoot, path))

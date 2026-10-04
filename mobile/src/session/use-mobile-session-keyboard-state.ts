@@ -5,7 +5,6 @@ import { useTerminalViewportRefit } from '../terminal/terminal-viewport-refit'
 import { saveCustomKeys, type CustomKey } from '../components/CustomKeyModal'
 import { LAST_VISITED_WORKTREE_STORAGE_KEY } from '../worktree/last-visited-worktree-repo'
 import { resolveTabStripScrollOffset } from './tab-strip-scroll'
-import { useScaledWindowDimensions } from '../layout/use-scaled-window-dimensions'
 import type { MobileSessionLifecycleModel } from './use-mobile-session-lifecycle'
 
 export function useMobileSessionKeyboardState(scope: MobileSessionLifecycleModel) {
@@ -58,21 +57,10 @@ export function useMobileSessionKeyboardState(scope: MobileSessionLifecycleModel
     subscribeToTerminal
   })
 
-  // Why: with the app on a secondary display (car cast/DeX) Samsung can report
-  // the phone display's IME height to this window — the lift then pushes the
-  // command dock fully off-screen. A real IME on this display is never taller
-  // than the window it covers, so a reported height >= window height means a
-  // foreign-display IME event; the dock must stay put instead.
-  const { height: windowHeight } = useScaledWindowDimensions()
   useEffect(() => {
     const onShow = (e: KeyboardEvent) => {
-      const height = e.endCoordinates?.height ?? 0
-      const screenY = e.endCoordinates?.screenY
-      const foreignDisplayIme =
-        height >= windowHeight ||
-        (screenY != null && (screenY <= 0 || screenY >= windowHeight))
-      notifyKeyboardVisibility(!foreignDisplayIme)
-      setKeyboardHeight(foreignDisplayIme ? 0 : height)
+      notifyKeyboardVisibility(true)
+      setKeyboardHeight(e.endCoordinates?.height ?? 0)
     }
     const onHide = () => {
       notifyKeyboardVisibility(false)
@@ -86,7 +74,7 @@ export function useMobileSessionKeyboardState(scope: MobileSessionLifecycleModel
       showSub.remove()
       hideSub.remove()
     }
-  }, [notifyKeyboardVisibility, windowHeight])
+  }, [notifyKeyboardVisibility])
 
   const scrollActiveTabIntoView = useCallback((tabId: string | null, animated: boolean) => {
     if (!tabId) {
